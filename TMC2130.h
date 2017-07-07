@@ -20,7 +20,7 @@
 class TMC2130
 {
 public:
-  // void setup(const size_t cs_pin);
+  void setup(const size_t cs_pin);
 
   // void setStepDirInput();
   // // void setSpiInput();
