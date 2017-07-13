@@ -21,25 +21,33 @@ class TMC2130
 {
 public:
   void setup(const size_t cs_pin);
-  void setup(const size_t cs_pin, const size_t enable_pin);
+  void setup(const size_t cs_pin,
+             const size_t enable_pin);
 
-  void setEnablePin(const size_t enable_pin);
   void enable();
   void disable();
 
   // void setStepDirInput();
   // void setSpiInput();
 
+  void enableAnalogInputCurrentScaling();
+  void disableAnalogInputCurrentScaling();
+  void enableInverseMotorDirection();
+  void disableInverseMotorDirection();
+
   // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
   void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
   size_t getMicrostepsPerStep();
 
+  void setRunCurrent(const uint8_t percent);
+  void setHoldCurrent(const uint8_t percent);
+  void setHoldDelay(const uint8_t percent);
+  void setAllCurrentValues(const uint8_t run_current_percent,
+                           const uint8_t hold_current_percent,
+                           const uint8_t hold_delay_percent);
+
   // void disableCoolStep();
   // // void enableCoolStep();
-
-  // double setCurrentScalePercent(uint8_t cs);
-  // const static uint8_t CURRENT_SCALE_PERCENT_MIN = 1;
-  // const static uint8_t CURRENT_SCALE_PERCENT_MAX = 100;
 
   // // Status getStatus();
 
@@ -110,6 +118,7 @@ private:
     } fields;
     uint32_t uint32;
   };
+  GlobalConfig global_config_;
 
   const static uint8_t ADDRESS_GSTAT = 0x01;
   union GlobalStatus
@@ -146,7 +155,7 @@ private:
 
   // Velocity Dependent Driver Feature Control Register Set
   const static uint8_t ADDRESS_IHOLD_IRUN = 0x10;
-  union DriverCurrentControl
+  union DriverCurrent
   {
     struct Fields
     {
@@ -157,6 +166,13 @@ private:
     } fields;
     uint32_t uint32;
   };
+  const static uint8_t PERCENT_MIN = 0;
+  const static uint8_t PERCENT_MAX = 100;
+  const static uint8_t CURRENT_SETTING_MIN = 0;
+  const static uint8_t CURRENT_SETTING_MAX = 31;
+  const static uint8_t HOLD_DELAY_MIN = 0;
+  const static uint8_t HOLD_DELAY_MAX = 15;
+  DriverCurrent driver_current_;
 
   const static uint8_t ADDRESS_TPOWERDOWN = 0x11;
   union PowerDownDelay
@@ -249,7 +265,14 @@ private:
   const static uint8_t MICROSTEPS_PER_STEP_EXPONENT_MAX = 8;
   uint8_t microsteps_per_step_exponent_;
 
+  void setEnablePin(const size_t enable_pin);
   MisoDatagram sendReceivePrevious(MosiDatagram & mosi_datagram);
+  MisoDatagram write(const uint8_t address,
+                     const uint32_t data);
+  uint8_t percentToCurrentSetting(uint8_t percent);
+  uint8_t percentToHoldDelaySetting(uint8_t percent);
+  void setGlobalConfig();
+  void setDriverCurrent();
   void setChopperConfig();
 
 };

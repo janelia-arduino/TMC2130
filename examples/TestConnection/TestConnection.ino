@@ -21,33 +21,24 @@ void setup()
 
 void loop()
 {
-  for (size_t i=0; i<=8; ++i)
-  {
-    stepper_driver.setMicrostepsPerStepPowerOfTwo(i);
-    Serial << "microsteps_per_step = " << stepper_driver.getMicrostepsPerStep() << endl;
-  }
+  // stepper_driver.enableAnalogInputCurrentScaling();
+  // stepper_driver.disableAnalogInputCurrentScaling();
 
-  // stepper_driver.setStepDirInput();
-  // Serial << "setStepDirInput\n";
-  // stepper_driver.setMicrostepsPerStepTo256();
-  // Serial << "setMicrostepsPerStepTo256\n";
-  // stepper_driver.setDefaultChopperConfig();
-  // Serial << "setDefaultChopperConfig\n";
-  // stepper_driver.disableCoolStep();
-  // Serial << "disableCoolStep\n";
-  // uint8_t current_scale_set = 18;
-  // double current_scale_actual = stepper_driver.setCurrentScalePercent(current_scale_set);
-  // Serial << "current_scale_percent set: " << current_scale_set << ", actual: " << current_scale_actual << "\n";
+  // for (size_t i=0; i<=8; ++i)
+  // {
+  //   stepper_driver.setMicrostepsPerStepPowerOfTwo(i);
+  //   Serial << "microsteps_per_step = " << stepper_driver.getMicrostepsPerStep() << endl;
+  // }
 
-  // TMC2130::Status status = stepper_driver.getStatus();
-  // Serial << "status.stall = " << status.stall << "\n";
-  // Serial << "status.over_temperature_shutdown = " << status.over_temperature_shutdown << "\n";
-  // Serial << "status.over_temperature_warning = " << status.over_temperature_warning << "\n";
-  // Serial << "status.short_to_ground_a = " << status.short_to_ground_a << "\n";
-  // Serial << "status.short_to_ground_b = " << status.short_to_ground_b << "\n";
-  // Serial << "status.open_load_a = " << status.open_load_a << "\n";
-  // Serial << "status.open_load_b = " << status.open_load_b << "\n";
-  // Serial << "status.standstill = " << status.standstill << "\n";
+  stepper_driver.setRunCurrent(100);
+  Serial << "\n";
+  stepper_driver.setHoldCurrent(50);
+  Serial << "\n";
+  stepper_driver.setHoldDelay(50);
+  Serial << "\n";
+
+  stepper_driver.setAllCurrentValues(100,50,50);
+  Serial << "\n";
 
   Serial << "\n";
   delay(LOOP_DELAY);

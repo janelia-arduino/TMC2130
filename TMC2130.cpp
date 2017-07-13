@@ -13,10 +13,14 @@ void TMC2130::setup(const size_t cs_pin)
   cs_pin_ = cs_pin;
   enable_pin_ = -1;
 
-  microsteps_per_step_exponent_ = MICROSTEPS_PER_STEP_EXPONENT_MAX;
+  global_config_.uint32 = 0;
+
+  driver_current_.uint32 = 0;
+
   chopper_config_.uint32 = 0;
   chopper_config_.fields.tbl = TBL_DEFAULT;
   chopper_config_.fields.toff = TOFF_DEFAULT;
+  microsteps_per_step_exponent_ = MICROSTEPS_PER_STEP_EXPONENT_MAX;
 
   pinMode(cs_pin_,OUTPUT);
   digitalWrite(cs_pin_,HIGH);
@@ -24,18 +28,11 @@ void TMC2130::setup(const size_t cs_pin)
   SPI.begin();
 }
 
-void TMC2130::setup(const size_t cs_pin, const size_t enable_pin)
+void TMC2130::setup(const size_t cs_pin,
+                    const size_t enable_pin)
 {
   setup(cs_pin);
   setEnablePin(enable_pin);
-}
-
-void TMC2130::setEnablePin(const size_t enable_pin)
-{
-  enable_pin_ = enable_pin;
-
-  pinMode(enable_pin_,OUTPUT);
-  disable();
 }
 
 void TMC2130::enable()
@@ -61,6 +58,30 @@ void TMC2130::disable()
 // void TMC2130::setSpiInput()
 // {
 // }
+
+void TMC2130::enableAnalogInputCurrentScaling()
+{
+  global_config_.fields.i_scale_analog = 1;
+  setGlobalConfig();
+}
+
+void TMC2130::disableAnalogInputCurrentScaling()
+{
+  global_config_.fields.i_scale_analog = 0;
+  setGlobalConfig();
+}
+
+void TMC2130::enableInverseMotorDirection()
+{
+  global_config_.fields.shaft = 1;
+  setGlobalConfig();
+}
+
+void TMC2130::disableInverseMotorDirection()
+{
+  global_config_.fields.shaft = 0;
+  setGlobalConfig();
+}
 
 void TMC2130::setMicrostepsPerStepPowerOfTwo(const uint8_t exponent)
 {
@@ -124,6 +145,47 @@ size_t TMC2130::getMicrostepsPerStep()
   return 1 << microsteps_per_step_exponent_;
 }
 
+void TMC2130::setRunCurrent(const uint8_t percent)
+{
+  uint8_t run_current = percentToCurrentSetting(percent);
+  Serial << "run_current_percent = " << percent << " run_current_setting = " << run_current << endl;
+
+  driver_current_.fields.irun = run_current;
+  setDriverCurrent();
+}
+
+void TMC2130::setHoldCurrent(const uint8_t percent)
+{
+  uint8_t hold_current = percentToCurrentSetting(percent);
+  Serial << "hold_current_percent = " << percent << " hold_current_setting = " << hold_current << endl;
+
+  driver_current_.fields.ihold = hold_current;
+  setDriverCurrent();
+}
+
+void TMC2130::setHoldDelay(const uint8_t percent)
+{
+  uint8_t hold_delay = percentToHoldDelaySetting(percent);
+  Serial << "hold_delay_percent = " << percent << " hold_delay = " << hold_delay << endl;
+
+  driver_current_.fields.iholddelay = hold_delay;
+  setDriverCurrent();
+}
+
+void TMC2130::setAllCurrentValues(const uint8_t run_current_percent,
+                                  const uint8_t hold_current_percent,
+                                  const uint8_t hold_delay_percent)
+{
+  uint8_t run_current = percentToCurrentSetting(run_current_percent);
+  uint8_t hold_current = percentToCurrentSetting(hold_current_percent);
+  uint8_t hold_delay = percentToHoldDelaySetting(hold_delay_percent);
+
+  driver_current_.fields.irun = run_current;
+  driver_current_.fields.ihold = hold_current;
+  driver_current_.fields.iholddelay = hold_delay;
+  setDriverCurrent();
+}
+
 // void TMC2130::disableCoolStep()
 // {
 //   setCoolStepRegister(SEMIN_DISABLED,
@@ -142,34 +204,20 @@ size_t TMC2130::getMicrostepsPerStep()
 //                              SEIMIN_HALF);
 // }
 
-// double TMC2130::setCurrentScalePercent(uint8_t cs)
-// {
-//   uint8_t cs_thresholded = cs;
-//   if (cs_thresholded > CURRENT_SCALE_PERCENT_MAX)
-//   {
-//     cs_thresholded = CURRENT_SCALE_PERCENT_MAX;
-//   }
-//   if (cs_thresholded < CURRENT_SCALE_PERCENT_MIN)
-//   {
-//     cs_thresholded = CURRENT_SCALE_PERCENT_MIN;
-//   }
-//   uint8_t cs_mapped = betterMap(cs_thresholded,
-//                                 CURRENT_SCALE_PERCENT_MIN,
-//                                 CURRENT_SCALE_PERCENT_MAX,
-//                                 CS_REGISTER_MIN,
-//                                 CS_REGISTER_MAX);
-//   setStallGuardRegister(cs_mapped,
-//                         SGT_DEFAULT,
-//                         SFILT_FILTERED_MODE);
-//   return (cs_mapped + 1)*100.0/32;
-// }
-
 // TMC2130::Status TMC2130::getStatus()
 // {
 //   return status_;
 // }
 
 // private
+void TMC2130::setEnablePin(const size_t enable_pin)
+{
+  enable_pin_ = enable_pin;
+
+  pinMode(enable_pin_,OUTPUT);
+  disable();
+}
+
 TMC2130::MisoDatagram TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_datagram)
 {
   MisoDatagram miso_datagram;
@@ -191,13 +239,43 @@ TMC2130::MisoDatagram TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_
   return miso_datagram;
 }
 
-void TMC2130::setChopperConfig()
+TMC2130::MisoDatagram TMC2130::write(const uint8_t address,
+                                     const uint32_t data)
 {
   MosiDatagram mosi_datagram;
   mosi_datagram.uint64 = 0;
   mosi_datagram.fields.rw = RW_WRITE;
-  mosi_datagram.fields.address = ADDRESS_CHOPCONF;
+  mosi_datagram.fields.address = address;
 
-  mosi_datagram.fields.data = chopper_config_.uint32;
+  mosi_datagram.fields.data = data;
   sendReceivePrevious(mosi_datagram);
+}
+
+uint8_t TMC2130::percentToCurrentSetting(uint8_t percent)
+{
+  uint8_t current_percent = constrain(percent,PERCENT_MIN,PERCENT_MAX);
+  uint8_t current_setting = map(current_percent,PERCENT_MIN,PERCENT_MAX,CURRENT_SETTING_MIN,CURRENT_SETTING_MAX);
+  return current_setting;
+}
+
+uint8_t TMC2130::percentToHoldDelaySetting(uint8_t percent)
+{
+  uint8_t hold_delay_percent = constrain(percent,PERCENT_MIN,PERCENT_MAX);
+  uint8_t hold_delay = map(hold_delay_percent,PERCENT_MIN,PERCENT_MAX,HOLD_DELAY_MIN,HOLD_DELAY_MAX);
+  return hold_delay;
+}
+
+void TMC2130::setGlobalConfig()
+{
+  write(ADDRESS_GCONF,global_config_.uint32);
+}
+
+void TMC2130::setDriverCurrent()
+{
+  write(ADDRESS_IHOLD_IRUN,driver_current_.uint32);
+}
+
+void TMC2130::setChopperConfig()
+{
+  write(ADDRESS_CHOPCONF,chopper_config_.uint32);
 }
