@@ -21,21 +21,18 @@ class TMC2130
 {
 public:
   void setup(const size_t cs_pin);
+  void setup(const size_t cs_pin, const size_t enable_pin);
+
+  void setEnablePin(const size_t enable_pin);
+  void enable();
+  void disable();
 
   // void setStepDirInput();
-  // // void setSpiInput();
+  // void setSpiInput();
 
-  // void setMicrostepsPerStepTo256();
-  // void setMicrostepsPerStepTo128();
-  // void setMicrostepsPerStepTo64();
-  // void setMicrostepsPerStepTo32();
-  // void setMicrostepsPerStepTo16();
-  // void setMicrostepsPerStepTo8();
-  // void setMicrostepsPerStepTo4();
-  // void setMicrostepsPerStepTo2();
-  // void setMicrostepsPerStepTo1();
-
-  // void setDefaultChopperConfig();
+  // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
+  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
+  size_t getMicrostepsPerStep();
 
   // void disableCoolStep();
   // // void enableCoolStep();
@@ -48,7 +45,7 @@ public:
 
 private:
   // SPISettings
-  const static uint32_t SPI_CLOCK = 4000000;
+  const static uint32_t SPI_CLOCK = 1000000;
   const static uint8_t SPI_BIT_ORDER = MSBFIRST;
   const static uint8_t SPI_MODE = SPI_MODE3;
 
@@ -234,6 +231,9 @@ private:
   const static uint8_t MRES_004 = 0b0110;
   const static uint8_t MRES_002 = 0b0111;
   const static uint8_t MRES_001 = 0b1000;
+  const static uint8_t TBL_DEFAULT = 0b01; // 24 clocks
+  const static uint8_t TOFF_DEFAULT = 0b1000; // Nclk = 268
+  ChopperConfig chopper_config_;
 
   const static uint8_t ADDRESS_COOLCONF = 0x6D;
   const static uint8_t ADDRESS_DCCTRL = 0x6E;
@@ -243,41 +243,14 @@ private:
   const static uint8_t ADDRESS_ENCM_CTRL = 0x72;
   const static uint8_t ADDRESS_LOST_STEPS = 0x73;
 
-  // size_t cs_pin_;
-  // Status status_;
+  size_t cs_pin_;
+  int enable_pin_;
 
-  // MisoDatagram writeRead(const uint32_t data);
+  const static uint8_t MICROSTEPS_PER_STEP_EXPONENT_MAX = 8;
+  uint8_t microsteps_per_step_exponent_;
 
-  // void configDriver(const uint8_t rdsel,
-  //                   const uint8_t vsense,
-  //                   const uint8_t sdoff,
-  //                   const uint8_t ts2g,
-  //                   const uint8_t diss2g,
-  //                   const uint8_t slpl,
-  //                   const uint8_t slph);
-  // void setDriverControlStepDir(const uint8_t mres,
-  //                              const uint8_t dedge,
-  //                              const uint8_t intpol);
-  // void configChopper(const uint8_t toff,
-  //                    const uint8_t hstrt,
-  //                    const uint8_t hend,
-  //                    const uint8_t hdec,
-  //                    const uint8_t rndtf,
-  //                    const uint8_t chm,
-  //                    const uint8_t tbl);
-  // void setCoolStepRegister(const uint8_t semin,
-  //                          const uint8_t seup,
-  //                          const uint8_t semax,
-  //                          const uint8_t sedn,
-  //                          const uint8_t seimin);
-  // void setStallGuardRegister(const uint8_t cs,
-  //                            const int8_t sgt,
-  //                            const uint8_t sfilt);
-  // long betterMap(long x,
-  //                long in_min,
-  //                long in_max,
-  //                long out_min,
-  //                long out_max);
+  MisoDatagram sendReceivePrevious(MosiDatagram & mosi_datagram);
+  void setChopperConfig();
 
 };
 
