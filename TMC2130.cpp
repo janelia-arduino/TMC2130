@@ -186,23 +186,6 @@ void TMC2130::setAllCurrentValues(const uint8_t run_current_percent,
   setDriverCurrent();
 }
 
-// void TMC2130::disableCoolStep()
-// {
-//   setCoolStepRegister(SEMIN_DISABLED,
-//                       SEUP_1,
-//                       0b00,
-//                       SEDN_32,
-//                       SEIMIN_HALF);
-// }
-
-// void TMC2130::enableCoolStep()
-// {
-//   setCoolStepRegister(SEMIN_DISABLED,
-//                              SEUP_1,
-//                              0b00,
-//                              SEDN_32,
-//                              SEIMIN_HALF);
-// }
 
 // TMC2130::Status TMC2130::getStatus()
 // {

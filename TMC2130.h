@@ -46,10 +46,7 @@ public:
                            const uint8_t hold_current_percent,
                            const uint8_t hold_delay_percent);
 
-  // void disableCoolStep();
-  // // void enableCoolStep();
-
-  // // Status getStatus();
+  // Status getStatus();
 
 private:
   // SPISettings
@@ -266,11 +263,14 @@ private:
   uint8_t microsteps_per_step_exponent_;
 
   void setEnablePin(const size_t enable_pin);
+
   MisoDatagram sendReceivePrevious(MosiDatagram & mosi_datagram);
   MisoDatagram write(const uint8_t address,
                      const uint32_t data);
+
   uint8_t percentToCurrentSetting(uint8_t percent);
   uint8_t percentToHoldDelaySetting(uint8_t percent);
+
   void setGlobalConfig();
   void setDriverCurrent();
   void setChopperConfig();
