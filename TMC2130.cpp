@@ -83,61 +83,20 @@ void TMC2130::disableInverseMotorDirection()
   setGlobalConfig();
 }
 
-void TMC2130::setMicrostepsPerStepPowerOfTwo(const uint8_t exponent)
+void TMC2130::setMicrostepsPerStep(const size_t microsteps_per_step)
 {
-  microsteps_per_step_exponent_ = exponent;
-
-  switch (exponent)
+  size_t microsteps_per_step_shifted = constrain(microsteps_per_step,
+                                                 MICROSTEPS_PER_STEP_MIN,
+                                                 MICROSTEPS_PER_STEP_MAX);
+  microsteps_per_step_shifted = microsteps_per_step >> 1;
+  size_t exponent = 0;
+  while (microsteps_per_step_shifted > 0)
   {
-    case 0:
-    {
-      chopper_config_.fields.mres = MRES_001;
-      break;
-    }
-    case 1:
-    {
-      chopper_config_.fields.mres = MRES_002;
-      break;
-    }
-    case 2:
-    {
-      chopper_config_.fields.mres = MRES_004;
-      break;
-    }
-    case 3:
-    {
-      chopper_config_.fields.mres = MRES_008;
-      break;
-    }
-    case 4:
-    {
-      chopper_config_.fields.mres = MRES_016;
-      break;
-    }
-    case 5:
-    {
-      chopper_config_.fields.mres = MRES_032;
-      break;
-    }
-    case 6:
-    {
-      chopper_config_.fields.mres = MRES_064;
-      break;
-    }
-    case 7:
-    {
-      chopper_config_.fields.mres = MRES_128;
-      break;
-    }
-    case 8:
-    default:
-    {
-      microsteps_per_step_exponent_ = MICROSTEPS_PER_STEP_EXPONENT_MAX;
-      chopper_config_.fields.mres = MRES_256;
-      break;
-    }
+    microsteps_per_step_shifted = microsteps_per_step_shifted >> 1;
+    ++exponent;
   }
-  setChopperConfig();
+  Serial << "microsteps_per_step = " << microsteps_per_step << ", exponent = " << exponent << endl;
+  setMicrostepsPerStepPowerOfTwo(exponent);
 }
 
 size_t TMC2130::getMicrostepsPerStep()
@@ -199,6 +158,63 @@ void TMC2130::setEnablePin(const size_t enable_pin)
 
   pinMode(enable_pin_,OUTPUT);
   disable();
+}
+
+void TMC2130::setMicrostepsPerStepPowerOfTwo(const uint8_t exponent)
+{
+  microsteps_per_step_exponent_ = exponent;
+
+  switch (exponent)
+  {
+    case 0:
+    {
+      chopper_config_.fields.mres = MRES_001;
+      break;
+    }
+    case 1:
+    {
+      chopper_config_.fields.mres = MRES_002;
+      break;
+    }
+    case 2:
+    {
+      chopper_config_.fields.mres = MRES_004;
+      break;
+    }
+    case 3:
+    {
+      chopper_config_.fields.mres = MRES_008;
+      break;
+    }
+    case 4:
+    {
+      chopper_config_.fields.mres = MRES_016;
+      break;
+    }
+    case 5:
+    {
+      chopper_config_.fields.mres = MRES_032;
+      break;
+    }
+    case 6:
+    {
+      chopper_config_.fields.mres = MRES_064;
+      break;
+    }
+    case 7:
+    {
+      chopper_config_.fields.mres = MRES_128;
+      break;
+    }
+    case 8:
+    default:
+    {
+      microsteps_per_step_exponent_ = MICROSTEPS_PER_STEP_EXPONENT_MAX;
+      chopper_config_.fields.mres = MRES_256;
+      break;
+    }
+  }
+  setChopperConfig();
 }
 
 TMC2130::MisoDatagram TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_datagram)

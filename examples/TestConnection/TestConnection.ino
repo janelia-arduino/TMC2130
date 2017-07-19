@@ -24,10 +24,10 @@ void loop()
   // stepper_driver.enableAnalogInputCurrentScaling();
   // stepper_driver.disableAnalogInputCurrentScaling();
 
-  // for (size_t i=0; i<=8; ++i)
+  // for (size_t i=0; i<=300; ++i)
   // {
-  //   stepper_driver.setMicrostepsPerStepPowerOfTwo(i);
-  //   Serial << "microsteps_per_step = " << stepper_driver.getMicrostepsPerStep() << endl;
+  //   stepper_driver.setMicrostepsPerStep(i);
+  //   delay(100);
   // }
 
   stepper_driver.setRunCurrent(100);

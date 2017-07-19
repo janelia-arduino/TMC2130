@@ -35,8 +35,8 @@ public:
   void enableInverseMotorDirection();
   void disableInverseMotorDirection();
 
-  // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
-  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
+  // valid values = 1,2,4,8,...128,256, other values get rounded down
+  void setMicrostepsPerStep(const size_t microsteps_per_step);
   size_t getMicrostepsPerStep();
 
   void setRunCurrent(const uint8_t percent);
@@ -259,10 +259,15 @@ private:
   size_t cs_pin_;
   int enable_pin_;
 
+  const static uint8_t MICROSTEPS_PER_STEP_MIN = 1;
+  const static uint8_t MICROSTEPS_PER_STEP_MAX = 256;
   const static uint8_t MICROSTEPS_PER_STEP_EXPONENT_MAX = 8;
   uint8_t microsteps_per_step_exponent_;
 
   void setEnablePin(const size_t enable_pin);
+
+  // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
+  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
 
   MisoDatagram sendReceivePrevious(MosiDatagram & mosi_datagram);
   MisoDatagram write(const uint8_t address,
