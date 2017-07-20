@@ -95,7 +95,7 @@ void TMC2130::setMicrostepsPerStep(const size_t microsteps_per_step)
     microsteps_per_step_shifted = microsteps_per_step_shifted >> 1;
     ++exponent;
   }
-  Serial << "microsteps_per_step = " << microsteps_per_step << ", exponent = " << exponent << endl;
+  // Serial << "microsteps_per_step = " << microsteps_per_step << ", exponent = " << exponent << endl;
   setMicrostepsPerStepPowerOfTwo(exponent);
 }
 
@@ -107,7 +107,7 @@ size_t TMC2130::getMicrostepsPerStep()
 void TMC2130::setRunCurrent(const uint8_t percent)
 {
   uint8_t run_current = percentToCurrentSetting(percent);
-  Serial << "run_current_percent = " << percent << " run_current_setting = " << run_current << endl;
+  // Serial << "run_current_percent = " << percent << " run_current_setting = " << run_current << endl;
 
   driver_current_.fields.irun = run_current;
   setDriverCurrent();
@@ -116,7 +116,7 @@ void TMC2130::setRunCurrent(const uint8_t percent)
 void TMC2130::setHoldCurrent(const uint8_t percent)
 {
   uint8_t hold_current = percentToCurrentSetting(percent);
-  Serial << "hold_current_percent = " << percent << " hold_current_setting = " << hold_current << endl;
+  // Serial << "hold_current_percent = " << percent << " hold_current_setting = " << hold_current << endl;
 
   driver_current_.fields.ihold = hold_current;
   setDriverCurrent();
@@ -125,7 +125,7 @@ void TMC2130::setHoldCurrent(const uint8_t percent)
 void TMC2130::setHoldDelay(const uint8_t percent)
 {
   uint8_t hold_delay = percentToHoldDelaySetting(percent);
-  Serial << "hold_delay_percent = " << percent << " hold_delay = " << hold_delay << endl;
+  // Serial << "hold_delay_percent = " << percent << " hold_delay = " << hold_delay << endl;
 
   driver_current_.fields.iholddelay = hold_delay;
   setDriverCurrent();
@@ -221,17 +221,17 @@ TMC2130::MisoDatagram TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_
 {
   MisoDatagram miso_datagram;
   miso_datagram.uint64 = 0;
-  // SPI.beginTransaction(SPISettings(SPI_CLOCK,SPI_BIT_ORDER,SPI_MODE));
-  // digitalWrite(cs_pin_,LOW);
+  SPI.beginTransaction(SPISettings(SPI_CLOCK,SPI_BIT_ORDER,SPI_MODE));
+  digitalWrite(cs_pin_,LOW);
   for (int i=(DATAGRAM_SIZE - 1); i>=0; --i)
   {
     uint8_t byte_write = (mosi_datagram.uint64 >> (8*i)) & 0xff;
-    Serial << "byte_write = "<< _HEX(byte_write) << endl;
-    // uint8_t byte_read = SPI.transfer(byte_write);
-    // miso_datagram.uint64 |= byte_read << (8*i);
+    // Serial << "byte_write = "<< _HEX(byte_write) << endl;
+    uint8_t byte_read = SPI.transfer(byte_write);
+    miso_datagram.uint64 |= byte_read << (8*i);
   }
-  // digitalWrite(cs_pin_,HIGH);
-  // SPI.endTransaction();
+  digitalWrite(cs_pin_,HIGH);
+  SPI.endTransaction();
   // noInterrupts();
   // status_ = miso_datagram.fields.status;
   // interrupts();
@@ -247,7 +247,8 @@ TMC2130::MisoDatagram TMC2130::write(const uint8_t address,
   mosi_datagram.fields.address = address;
 
   mosi_datagram.fields.data = data;
-  sendReceivePrevious(mosi_datagram);
+  MisoDatagram miso_datagram = sendReceivePrevious(mosi_datagram);
+  return miso_datagram;
 }
 
 uint8_t TMC2130::percentToCurrentSetting(uint8_t percent)

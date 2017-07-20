@@ -259,8 +259,8 @@ private:
   size_t cs_pin_;
   int enable_pin_;
 
-  const static uint8_t MICROSTEPS_PER_STEP_MIN = 1;
-  const static uint8_t MICROSTEPS_PER_STEP_MAX = 256;
+  const static size_t MICROSTEPS_PER_STEP_MIN = 1;
+  const static size_t MICROSTEPS_PER_STEP_MAX = 256;
   const static uint8_t MICROSTEPS_PER_STEP_EXPONENT_MAX = 8;
   uint8_t microsteps_per_step_exponent_;
 
