@@ -24,16 +24,13 @@ public:
   void setup(const size_t cs_pin,
              const size_t enable_pin);
 
+  void initialize();
+
   void enable();
   void disable();
 
-  // void setStepDirInput();
-  // void setSpiInput();
-
-  void enableAnalogInputCurrentScaling();
-  void disableAnalogInputCurrentScaling();
-  void enableInverseMotorDirection();
-  void disableInverseMotorDirection();
+  uint8_t getVersion();
+  bool checkVersion();
 
   // valid values = 1,2,4,8,...128,256, other values get rounded down
   void setMicrostepsPerStep(const size_t microsteps_per_step);
@@ -46,7 +43,23 @@ public:
                            const uint8_t hold_current_percent,
                            const uint8_t hold_delay_percent);
 
-  // Status getStatus();
+  struct Status
+  {
+    uint32_t load : 10;
+    uint32_t space0 : 5;
+    uint32_t full_step_active : 1;
+    uint32_t current_scaling : 5;
+    uint32_t space1 : 3;
+    uint32_t stall : 1;
+    uint32_t over_temperature_shutdown : 1;
+    uint32_t over_temperature_warning : 1;
+    uint32_t short_to_ground_a : 1;
+    uint32_t short_to_ground_b : 1;
+    uint32_t open_load_a : 1;
+    uint32_t open_load_b : 1;
+    uint32_t standstill : 1;
+  };
+  Status getStatus();
 
 private:
   // SPISettings
@@ -73,17 +86,24 @@ private:
   const static uint8_t RW_READ = 0;
   const static uint8_t RW_WRITE = 1;
 
+  struct SpiStatus
+  {
+    uint8_t reset_flag : 1;
+    uint8_t driver_error : 1;
+    uint8_t stallguard : 1;
+    uint8_t standstill : 1;
+    uint8_t space : 4;
+  };
+  SpiStatus spi_status_;
+
   // MISO Datagram
   union MisoDatagram
   {
     struct Fields
     {
       uint64_t data : 32;
-      uint64_t reset_flag : 1;
-      uint64_t driver_error : 1;
-      uint64_t stallguard : 1;
-      uint64_t standstill : 1;
-      uint64_t space : 28;
+      SpiStatus spi_status;
+      uint64_t space : 24;
     } fields;
     uint64_t uint64;
   };
@@ -143,11 +163,12 @@ private:
       uint32_t dco : 1;
       uint32_t one : 1;
       uint32_t dont_care : 1;
-      uint32_t version : 8;
       uint32_t space : 16;
+      uint32_t version : 8;
     } fields;
     uint32_t uint32;
   };
+  const static uint8_t VERSION = 0x11;
 
 
   // Velocity Dependent Driver Feature Control Register Set
@@ -183,8 +204,12 @@ private:
   };
 
   const static uint8_t ADDRESS_TSTEP = 0x12;
+
   const static uint8_t ADDRESS_TPWMTHRS = 0x13;
+  const static uint32_t TPWMTHRS_DEFAULT = 500;
+
   const static uint8_t ADDRESS_TCOOLTHRS = 0x14;
+
   const static uint8_t ADDRESS_THIGH = 0x15;
 
   // SPI Mode Register
@@ -244,14 +269,45 @@ private:
   const static uint8_t MRES_004 = 0b0110;
   const static uint8_t MRES_002 = 0b0111;
   const static uint8_t MRES_001 = 0b1000;
-  const static uint8_t TBL_DEFAULT = 0b01; // 24 clocks
-  const static uint8_t TOFF_DEFAULT = 0b1000; // Nclk = 268
+  const static uint8_t TOFF_DEFAULT = 0b0011; // Nclk = 108
+  const static uint8_t HSTRT_DEFAULT = 0b100; // 4
+  const static uint8_t HEND_DEFAULT = 0b0001; // 1
+  const static uint8_t CHM_DEFAULT = 0b0; // standard
+  const static uint8_t TBL_DEFAULT = 0b10; // 36 clocks
   ChopperConfig chopper_config_;
 
   const static uint8_t ADDRESS_COOLCONF = 0x6D;
   const static uint8_t ADDRESS_DCCTRL = 0x6E;
   const static uint8_t ADDRESS_DRV_STATUS = 0x6F;
+  union DriveStatus
+  {
+    struct Fields
+    {
+      Status status;
+    } fields;
+    uint32_t uint32;
+  };
   const static uint8_t ADDRESS_PWMCONF = 0x70;
+  union PwmConfig
+  {
+    struct Fields
+    {
+      uint32_t pwm_ampl : 8;
+      uint32_t pwm_grad : 8;
+      uint32_t pwm_freq : 2;
+      uint32_t pwm_autoscale : 1;
+      uint32_t pwm_symmetric : 1;
+      uint32_t freewheel : 2;
+      uint32_t space : 10;
+    } fields;
+    uint32_t uint32;
+  };
+  const static uint8_t PWM_AMPL_DEFAULT = 200;
+  const static uint8_t PWM_GRAD_DEFAULT = 1;
+  const static uint8_t PWM_FREQ_DEFAULT = 0b00; // 2/1024 fclk
+  const static uint8_t PWM_AUTOSCALE_DEFAULT = 1;
+  PwmConfig pwm_config_;
+
   const static uint8_t ADDRESS_PWM_SCALE = 0x71;
   const static uint8_t ADDRESS_ENCM_CTRL = 0x72;
   const static uint8_t ADDRESS_LOST_STEPS = 0x73;
@@ -266,19 +322,32 @@ private:
 
   void setEnablePin(const size_t enable_pin);
 
+  // void setStepDirInput();
+  // void setSpiInput();
+
+  void enableAnalogInputCurrentScaling();
+  void disableAnalogInputCurrentScaling();
+  void enableStealthChop();
+  void disableStealthChop();
+  void enableInverseMotorDirection();
+  void disableInverseMotorDirection();
+
   // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
   void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
 
-  MisoDatagram sendReceivePrevious(MosiDatagram & mosi_datagram);
-  MisoDatagram write(const uint8_t address,
+  uint32_t sendReceivePrevious(MosiDatagram & mosi_datagram);
+  uint32_t write(const uint8_t address,
                      const uint32_t data);
+  uint32_t read(const uint8_t address);
 
-  uint8_t percentToCurrentSetting(uint8_t percent);
-  uint8_t percentToHoldDelaySetting(uint8_t percent);
+  uint8_t percentToCurrentSetting(const uint8_t percent);
+  uint8_t percentToHoldDelaySetting(const uint8_t percent);
 
   void setGlobalConfig();
   void setDriverCurrent();
   void setChopperConfig();
+  void setPwmThreshold(const uint32_t value);
+  void setPwmConfig();
 
 };
 

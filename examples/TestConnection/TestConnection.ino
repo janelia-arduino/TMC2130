@@ -21,24 +21,39 @@ void setup()
 
 void loop()
 {
-  // stepper_driver.enableAnalogInputCurrentScaling();
-  // stepper_driver.disableAnalogInputCurrentScaling();
+  if (stepper_driver.checkVersion())
+  {
+    Serial << "SPI communicating with stepper driver!\n";
+  }
+  else
+  {
+    Serial << "SPI not communicating with stepper driver!\n";
+  }
 
-  // for (size_t i=0; i<=300; ++i)
-  // {
-  //   stepper_driver.setMicrostepsPerStep(i);
-  //   delay(100);
-  // }
+  stepper_driver.initialize();
 
-  stepper_driver.setRunCurrent(100);
-  Serial << "\n";
-  stepper_driver.setHoldCurrent(50);
-  Serial << "\n";
-  stepper_driver.setHoldDelay(50);
-  Serial << "\n";
+  TMC2130::Status status = stepper_driver.getStatus();
+  Serial << "status.load = " << status.load << "\n";
+  Serial << "status.full_step_active = " << status.full_step_active << "\n";
+  Serial << "status.current_scaling = " << status.current_scaling << "\n";
+  Serial << "status.stall = " << status.stall << "\n";
+  Serial << "status.over_temperature_shutdown = " << status.over_temperature_shutdown << "\n";
+  Serial << "status.over_temperature_warning = " << status.over_temperature_warning << "\n";
+  Serial << "status.short_to_ground_a = " << status.short_to_ground_a << "\n";
+  Serial << "status.short_to_ground_b = " << status.short_to_ground_b << "\n";
+  Serial << "status.open_load_a = " << status.open_load_a << "\n";
+  Serial << "status.open_load_b = " << status.open_load_b << "\n";
+  Serial << "status.standstill = " << status.standstill << "\n";
 
-  stepper_driver.setAllCurrentValues(100,50,50);
-  Serial << "\n";
+  // stepper_driver.setRunCurrent(100);
+  // Serial << "\n";
+  // stepper_driver.setHoldCurrent(50);
+  // Serial << "\n";
+  // stepper_driver.setHoldDelay(50);
+  // Serial << "\n";
+
+  // stepper_driver.setAllCurrentValues(100,50,50);
+  // Serial << "\n";
 
   Serial << "\n";
   delay(LOOP_DELAY);
