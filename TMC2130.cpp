@@ -44,6 +44,21 @@ void TMC2130::setup(const size_t cs_pin,
   setEnablePin(enable_pin);
 }
 
+bool TMC2130::communicating()
+{
+  return (getVersion() == VERSION);
+}
+
+uint8_t TMC2130::getVersion()
+{
+  uint32_t data = read(ADDRESS_IOIN);
+
+  InputPinStatus input_pin_status;
+  input_pin_status.uint32 = data;
+
+  return input_pin_status.fields.version;
+}
+
 void TMC2130::initialize()
 {
   setMicrostepsPerStep(256);
@@ -66,21 +81,6 @@ void TMC2130::disable()
   {
     digitalWrite(enable_pin_,HIGH);
   }
-}
-
-uint8_t TMC2130::getVersion()
-{
-  uint32_t data = read(ADDRESS_IOIN);
-
-  InputPinStatus input_pin_status;
-  input_pin_status.uint32 = data;
-
-  return input_pin_status.fields.version;
-}
-
-bool TMC2130::checkVersion()
-{
-  return (getVersion() == VERSION);
 }
 
 void TMC2130::setMicrostepsPerStep(const size_t microsteps_per_step)
@@ -360,4 +360,3 @@ void TMC2130::setPwmConfig()
 {
   write(ADDRESS_PWMCONF,pwm_config_.uint32);
 }
-

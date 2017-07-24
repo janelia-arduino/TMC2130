@@ -24,13 +24,13 @@ public:
   void setup(const size_t cs_pin,
              const size_t enable_pin);
 
+  bool communicating();
+  uint8_t getVersion();
+
   void initialize();
 
   void enable();
   void disable();
-
-  uint8_t getVersion();
-  bool checkVersion();
 
   // valid values = 1,2,4,8,...128,256, other values get rounded down
   void setMicrostepsPerStep(const size_t microsteps_per_step);

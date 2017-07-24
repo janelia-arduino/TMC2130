@@ -21,7 +21,7 @@ void setup()
 
 void loop()
 {
-  if (stepper_driver.checkVersion())
+  if (stepper_driver.communicating())
   {
     Serial << "SPI communicating with stepper driver!\n";
   }
