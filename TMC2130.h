@@ -59,6 +59,8 @@ public:
     uint32_t open_load_b : 1;
     uint32_t standstill : 1;
   };
+  const static uint16_t LOAD_MAX = 1023;
+  const static uint8_t CURRENT_SCALING_MAX = 31;
   Status getStatus();
 
 private:
@@ -178,9 +180,11 @@ private:
     struct Fields
     {
       uint32_t ihold : 5;
+      uint32_t space0 : 3;
       uint32_t irun : 5;
+      uint32_t space1 : 3;
       uint32_t iholddelay : 4;
-      uint32_t space : 18;
+      uint32_t space2 : 12;
     } fields;
     uint32_t uint32;
   };
@@ -277,6 +281,26 @@ private:
   ChopperConfig chopper_config_;
 
   const static uint8_t ADDRESS_COOLCONF = 0x6D;
+  union CoolConfig
+  {
+    struct Fields
+    {
+      uint32_t semin : 4;
+      uint32_t reserved0 : 1;
+      uint32_t seup : 2;
+      uint32_t reserved1 : 1;
+      uint32_t semax : 4;
+      uint32_t reserved2 : 1;
+      uint32_t sedn : 2;
+      uint32_t seimin : 1;
+      uint32_t sgt : 7;
+      uint32_t reserved3 : 1;
+      uint32_t sfilt : 1;
+      uint32_t reserved4 : 1;
+    } fields;
+    uint32_t uint32;
+  };
+
   const static uint8_t ADDRESS_DCCTRL = 0x6E;
   const static uint8_t ADDRESS_DRV_STATUS = 0x6F;
   union DriveStatus
