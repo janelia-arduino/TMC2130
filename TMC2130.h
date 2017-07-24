@@ -300,6 +300,13 @@ private:
     } fields;
     uint32_t uint32;
   };
+  const static uint8_t SEMIN_DEFAULT = 0b0000;
+  const static uint8_t SEUP_DEFAULT = 0b10;
+  const static uint8_t SEMAX_DEFAULT = 0b0000;
+  const static uint8_t SEDN_DEFAULT = 0b00;
+  const static uint8_t SEIMIN_DEFAULT = 0;
+  const static int8_t SG_DEFAULT = 0;
+  const static uint8_t SFILT_DEFAULT = 0;
 
   const static uint8_t ADDRESS_DCCTRL = 0x6E;
   const static uint8_t ADDRESS_DRV_STATUS = 0x6F;
