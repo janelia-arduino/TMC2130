@@ -63,6 +63,13 @@ public:
   const static uint8_t CURRENT_SCALING_MAX = 31;
   Status getStatus();
 
+  void enableAnalogInputCurrentScaling();
+  void disableAnalogInputCurrentScaling();
+  void enableStealthChop();
+  void disableStealthChop();
+  void enableInverseMotorDirection();
+  void disableInverseMotorDirection();
+
 private:
   // SPISettings
   const static uint32_t SPI_CLOCK = 1000000;
@@ -355,13 +362,6 @@ private:
 
   // void setStepDirInput();
   // void setSpiInput();
-
-  void enableAnalogInputCurrentScaling();
-  void disableAnalogInputCurrentScaling();
-  void enableStealthChop();
-  void disableStealthChop();
-  void enableInverseMotorDirection();
-  void disableInverseMotorDirection();
 
   // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
   void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);

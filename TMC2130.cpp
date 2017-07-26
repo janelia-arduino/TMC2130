@@ -148,23 +148,6 @@ TMC2130::Status TMC2130::getStatus()
   return drive_status.fields.status;
 }
 
-// private
-void TMC2130::setEnablePin(const size_t enable_pin)
-{
-  enable_pin_ = enable_pin;
-
-  pinMode(enable_pin_,OUTPUT);
-  disable();
-}
-
-// void TMC2130::setStepDirInput()
-// {
-// }
-
-// void TMC2130::setSpiInput()
-// {
-// }
-
 void TMC2130::enableAnalogInputCurrentScaling()
 {
   global_config_.fields.i_scale_analog = 1;
@@ -200,6 +183,23 @@ void TMC2130::disableInverseMotorDirection()
   global_config_.fields.shaft = 0;
   setGlobalConfig();
 }
+
+// private
+void TMC2130::setEnablePin(const size_t enable_pin)
+{
+  enable_pin_ = enable_pin;
+
+  pinMode(enable_pin_,OUTPUT);
+  disable();
+}
+
+// void TMC2130::setStepDirInput()
+// {
+// }
+
+// void TMC2130::setSpiInput()
+// {
+// }
 
 void TMC2130::setMicrostepsPerStepPowerOfTwo(const uint8_t exponent)
 {
