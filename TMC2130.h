@@ -70,6 +70,16 @@ public:
   void enableInverseMotorDirection();
   void disableInverseMotorDirection();
 
+  void enableAutomaticCurrentScaling();
+  void disableAutomaticCurrentScaling();
+  void setPwmAmplitude(const uint8_t percent);
+  void setPwmGradient(const uint8_t percent);
+
+  void setZeroHoldCurrentNormalOperation();
+  void setZeroHoldCurrentFreewheeling();
+  void setZeroHoldCurrentBraking();
+  void setZeroHoldCurrentIntenseBraking();
+
 private:
   // SPISettings
   const static uint32_t SPI_CLOCK = 1000000;
@@ -340,10 +350,22 @@ private:
     } fields;
     uint32_t uint32;
   };
+  const static uint8_t PWM_AMPL_MIN = 0;
+  const static uint8_t PWM_AMPL_MAX = 255;
   const static uint8_t PWM_AMPL_DEFAULT = 200;
+  const static uint8_t PWM_GRAD_AUTOSCALE_MIN = 1;
+  const static uint8_t PWM_GRAD_AUTOSCALE_MAX = 15;
+  const static uint8_t PWM_GRAD_MIN = 0;
+  const static uint8_t PWM_GRAD_MAX = 255;
   const static uint8_t PWM_GRAD_DEFAULT = 1;
   const static uint8_t PWM_FREQ_DEFAULT = 0b00; // 2/1024 fclk
+  const static uint8_t PWM_AUTOSCALE_DISABLED = 0;
+  const static uint8_t PWM_AUTOSCALE_ENABLED = 1;
   const static uint8_t PWM_AUTOSCALE_DEFAULT = 1;
+  const static uint8_t PWM_FREEWHEEL_NORMAL = 0;
+  const static uint8_t PWM_FREEWHEEL_FREEWHEELING = 1;
+  const static uint8_t PWM_FREEWHEEL_INTENSE_BRAKING = 2;
+  const static uint8_t PWM_FREEWHEEL_BRAKING = 3;
   PwmConfig pwm_config_;
 
   const static uint8_t ADDRESS_PWM_SCALE = 0x71;
@@ -373,6 +395,8 @@ private:
 
   uint8_t percentToCurrentSetting(const uint8_t percent);
   uint8_t percentToHoldDelaySetting(const uint8_t percent);
+  uint8_t percentToPwmAmplitude(const uint8_t percent);
+  uint8_t percentToPwmGradient(const uint8_t percent);
 
   void setGlobalConfig();
   void setDriverCurrent();
