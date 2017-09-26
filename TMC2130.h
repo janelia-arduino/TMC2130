@@ -65,20 +65,33 @@ public:
 
   void enableAnalogInputCurrentScaling();
   void disableAnalogInputCurrentScaling();
-  void enableStealthChop();
-  void disableStealthChop();
   void enableInverseMotorDirection();
   void disableInverseMotorDirection();
 
+  void enableStealthChop();
+  void disableStealthChop();
   void enableAutomaticCurrentScaling();
   void disableAutomaticCurrentScaling();
-  void setPwmAmplitude(const uint8_t percent);
-  void setPwmGradient(const uint8_t percent);
+  void setPwmOffset(const uint8_t offset);
+  void setPwmGradient(const uint8_t gradient);
+  enum ZeroHoldCurrentOperation
+    {
+     NORMAL=0,
+     FREEWHEELING=1,
+     STRONG_BRAKING=2,
+     BRAKING=3,
+    };
+  void setZeroHoldCurrentOperation(ZeroHoldCurrentOperation operation);
 
-  void setZeroHoldCurrentNormalOperation();
-  void setZeroHoldCurrentFreewheeling();
-  void setZeroHoldCurrentBraking();
-  void setZeroHoldCurrentIntenseBraking();
+  struct Settings
+  {
+    bool stealth_chop_enabled;
+    bool automatic_current_scaling_enabled;
+    uint8_t pwm_offset;
+    uint8_t pwm_gradient;
+    uint8_t zero_hold_current_operation;
+  };
+  Settings getSettings();
 
 private:
   // SPISettings
@@ -352,20 +365,18 @@ private:
   };
   const static uint8_t PWM_AMPL_MIN = 0;
   const static uint8_t PWM_AMPL_MAX = 255;
+  const static uint8_t PWM_AMPL_AUTOSCALE_MIN = 64;
+  const static uint8_t PWM_AMPL_AUTOSCALE_MAX = 255;
   const static uint8_t PWM_AMPL_DEFAULT = 200;
-  const static uint8_t PWM_GRAD_AUTOSCALE_MIN = 1;
-  const static uint8_t PWM_GRAD_AUTOSCALE_MAX = 15;
   const static uint8_t PWM_GRAD_MIN = 0;
   const static uint8_t PWM_GRAD_MAX = 255;
-  const static uint8_t PWM_GRAD_DEFAULT = 1;
+  const static uint8_t PWM_GRAD_AUTOSCALE_MIN = 1;
+  const static uint8_t PWM_GRAD_AUTOSCALE_MAX = 15;
+  const static uint8_t PWM_GRAD_DEFAULT = 4;
   const static uint8_t PWM_FREQ_DEFAULT = 0b00; // 2/1024 fclk
   const static uint8_t PWM_AUTOSCALE_DISABLED = 0;
   const static uint8_t PWM_AUTOSCALE_ENABLED = 1;
   const static uint8_t PWM_AUTOSCALE_DEFAULT = 1;
-  const static uint8_t PWM_FREEWHEEL_NORMAL = 0;
-  const static uint8_t PWM_FREEWHEEL_FREEWHEELING = 1;
-  const static uint8_t PWM_FREEWHEEL_INTENSE_BRAKING = 2;
-  const static uint8_t PWM_FREEWHEEL_BRAKING = 3;
   PwmConfig pwm_config_;
 
   const static uint8_t ADDRESS_PWM_SCALE = 0x71;
@@ -390,13 +401,14 @@ private:
 
   uint32_t sendReceivePrevious(MosiDatagram & mosi_datagram);
   uint32_t write(const uint8_t address,
-                     const uint32_t data);
+                 const uint32_t data);
   uint32_t read(const uint8_t address);
 
   uint8_t percentToCurrentSetting(const uint8_t percent);
   uint8_t percentToHoldDelaySetting(const uint8_t percent);
-  uint8_t percentToPwmAmplitude(const uint8_t percent);
-  uint8_t percentToPwmGradient(const uint8_t percent);
+
+  uint8_t offsetToPwmAmpl(const uint8_t offset);
+  uint8_t gradientToPwmGrad(const uint8_t gradient);
 
   void setGlobalConfig();
   void setDriverCurrent();

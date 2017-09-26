@@ -160,18 +160,6 @@ void TMC2130::disableAnalogInputCurrentScaling()
   setGlobalConfig();
 }
 
-void TMC2130::enableStealthChop()
-{
-  global_config_.fields.en_pwm_mode = 1;
-  setGlobalConfig();
-}
-
-void TMC2130::disableStealthChop()
-{
-  global_config_.fields.en_pwm_mode = 0;
-  setGlobalConfig();
-}
-
 void TMC2130::enableInverseMotorDirection()
 {
   global_config_.fields.shaft = 1;
@@ -181,6 +169,18 @@ void TMC2130::enableInverseMotorDirection()
 void TMC2130::disableInverseMotorDirection()
 {
   global_config_.fields.shaft = 0;
+  setGlobalConfig();
+}
+
+void TMC2130::enableStealthChop()
+{
+  global_config_.fields.en_pwm_mode = 1;
+  setGlobalConfig();
+}
+
+void TMC2130::disableStealthChop()
+{
+  global_config_.fields.en_pwm_mode = 0;
   setGlobalConfig();
 }
 
@@ -200,42 +200,36 @@ void TMC2130::disableAutomaticCurrentScaling()
   setPwmConfig();
 }
 
-void TMC2130::setPwmAmplitude(const uint8_t percent)
+void TMC2130::setPwmOffset(const uint8_t offset)
 {
-  uint8_t pwm_amplitude = percentToPwmAmplitude(percent);
-  pwm_config_.fields.pwm_ampl = pwm_amplitude;
+  uint8_t pwm_ampl = offsetToPwmAmpl(offset);
+  pwm_config_.fields.pwm_ampl = pwm_ampl;
   setPwmConfig();
 }
 
-void TMC2130::setPwmGradient(const uint8_t percent)
+void TMC2130::setPwmGradient(const uint8_t gradient)
 {
-  uint8_t pwm_gradient = percentToPwmGradient(percent);
-  pwm_config_.fields.pwm_grad = pwm_gradient;
+  uint8_t pwm_grad = gradientToPwmGrad(gradient);
+  pwm_config_.fields.pwm_grad = pwm_grad;
   setPwmConfig();
 }
 
-void TMC2130::setZeroHoldCurrentNormalOperation()
+void TMC2130::setZeroHoldCurrentOperation(TMC2130::ZeroHoldCurrentOperation operation)
 {
-  pwm_config_.fields.freewheel = PWM_FREEWHEEL_NORMAL;
+  pwm_config_.fields.freewheel = operation;
   setPwmConfig();
 }
 
-void TMC2130::setZeroHoldCurrentFreewheeling()
+TMC2130::Settings TMC2130::getSettings()
 {
-  pwm_config_.fields.freewheel = PWM_FREEWHEEL_FREEWHEELING;
-  setPwmConfig();
-}
+  Settings settings;
+  settings.stealth_chop_enabled = global_config_.fields.en_pwm_mode;
+  settings.automatic_current_scaling_enabled = pwm_config_.fields.pwm_autoscale;
+  settings.pwm_offset = pwm_config_.fields.pwm_ampl;
+  settings.pwm_gradient = pwm_config_.fields.pwm_grad;
+  settings.zero_hold_current_operation = pwm_config_.fields.freewheel;
 
-void TMC2130::setZeroHoldCurrentBraking()
-{
-  pwm_config_.fields.freewheel = PWM_FREEWHEEL_BRAKING;
-  setPwmConfig();
-}
-
-void TMC2130::setZeroHoldCurrentIntenseBraking()
-{
-  pwm_config_.fields.freewheel = PWM_FREEWHEEL_INTENSE_BRAKING;
-  setPwmConfig();
+  return settings;
 }
 
 // private
@@ -402,42 +396,28 @@ uint8_t TMC2130::percentToHoldDelaySetting(const uint8_t percent)
   return hold_delay;
 }
 
-uint8_t TMC2130::percentToPwmAmplitude(const uint8_t percent)
+uint8_t TMC2130::offsetToPwmAmpl(const uint8_t offset)
 {
-  uint8_t pwm_amplitude_percent = constrain(percent,
-                                            PERCENT_MIN,
-                                            PERCENT_MAX);
-  uint8_t pwm_amplitude = map(pwm_amplitude_percent,
-                              PERCENT_MIN,
-                              PERCENT_MAX,
-                              PWM_AMPL_MIN,
-                              PWM_AMPL_MAX);
-  return pwm_amplitude;
-}
-
-uint8_t TMC2130::percentToPwmGradient(const uint8_t percent)
-{
-  uint8_t pwm_gradient_percent = constrain(percent,
-                                           PERCENT_MIN,
-                                           PERCENT_MAX);
-  uint8_t pwm_gradient = 0;
+  uint8_t pwm_ampl = offset;
   if (pwm_config_.fields.pwm_autoscale)
   {
-    pwm_gradient = map(pwm_gradient_percent,
-                       PERCENT_MIN,
-                       PERCENT_MAX,
-                       PWM_GRAD_AUTOSCALE_MIN,
-                       PWM_GRAD_AUTOSCALE_MAX);
+    pwm_ampl = constrain(pwm_ampl,
+                         PWM_AMPL_AUTOSCALE_MIN,
+                         PWM_AMPL_AUTOSCALE_MAX);
   }
-  else
+  return pwm_ampl;
+}
+
+uint8_t TMC2130::gradientToPwmGrad(const uint8_t gradient)
+{
+  uint8_t pwm_grad = gradient;
+  if (pwm_config_.fields.pwm_autoscale)
   {
-    pwm_gradient = map(pwm_gradient_percent,
-                       PERCENT_MIN,
-                       PERCENT_MAX,
-                       PWM_GRAD_MIN,
-                       PWM_GRAD_MAX);
+    pwm_grad = constrain(pwm_grad,
+                         PWM_GRAD_AUTOSCALE_MIN,
+                         PWM_GRAD_AUTOSCALE_MAX);
   }
-  return pwm_gradient;
+  return pwm_grad;
 }
 
 void TMC2130::setGlobalConfig()
