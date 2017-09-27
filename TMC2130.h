@@ -72,24 +72,28 @@ public:
   void disableStealthChop();
   void enableAutomaticCurrentScaling();
   void disableAutomaticCurrentScaling();
-  void setPwmOffset(const uint8_t offset);
-  void setPwmGradient(const uint8_t gradient);
-  enum ZeroHoldCurrentOperation
+  enum ZeroHoldCurrentMode
     {
      NORMAL=0,
      FREEWHEELING=1,
      STRONG_BRAKING=2,
      BRAKING=3,
     };
-  void setZeroHoldCurrentOperation(ZeroHoldCurrentOperation operation);
+  void setZeroHoldCurrentMode(ZeroHoldCurrentMode mode);
+  void setPwmOffset(const uint8_t pwm_amplitude);
+  void setPwmGradient(const uint8_t pwm_amplitude);
+  uint8_t getPwmScale();
 
   struct Settings
   {
     bool stealth_chop_enabled;
     bool automatic_current_scaling_enabled;
+    uint8_t zero_hold_current_mode;
     uint8_t pwm_offset;
     uint8_t pwm_gradient;
-    uint8_t zero_hold_current_operation;
+    uint8_t irun;
+    uint8_t ihold;
+    uint8_t iholddelay;
   };
   Settings getSettings();
 
@@ -303,10 +307,11 @@ private:
   const static uint8_t MRES_004 = 0b0110;
   const static uint8_t MRES_002 = 0b0111;
   const static uint8_t MRES_001 = 0b1000;
-  const static uint8_t TOFF_DEFAULT = 0b0011; // Nclk = 108
-  const static uint8_t HSTRT_DEFAULT = 0b100; // 4
-  const static uint8_t HEND_DEFAULT = 0b0001; // 1
-  const static uint8_t CHM_DEFAULT = 0b0; // standard
+  const static uint8_t TOFF_DEFAULT = 4;
+  // hysteresis = 4 = 7 - 3
+  const static uint8_t HSTRT_DEFAULT = 6; // 7
+  const static uint8_t HEND_DEFAULT = 0; // -3
+  const static uint8_t CHM_DEFAULT = 0; // spreadCycle
   const static uint8_t TBL_DEFAULT = 0b10; // 36 clocks
   ChopperConfig chopper_config_;
 
@@ -407,8 +412,8 @@ private:
   uint8_t percentToCurrentSetting(const uint8_t percent);
   uint8_t percentToHoldDelaySetting(const uint8_t percent);
 
-  uint8_t offsetToPwmAmpl(const uint8_t offset);
-  uint8_t gradientToPwmGrad(const uint8_t gradient);
+  uint8_t pwmAmplitudeToPwmAmpl(const uint8_t pwm_amplitude);
+  uint8_t pwmAmplitudeToPwmGrad(const uint8_t pwm_amplitude);
 
   void setGlobalConfig();
   void setDriverCurrent();
