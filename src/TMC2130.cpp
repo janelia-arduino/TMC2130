@@ -4,7 +4,6 @@
 // Authors:
 // Peter Polidoro polidorop@janelia.hhmi.org
 // ----------------------------------------------------------------------------
-
 #include "TMC2130.h"
 
 
