@@ -3,7 +3,7 @@
 #include <Streaming.h>
 #include <TMC2130.h>
 
-const long BAUDRATE = 115200;
+const long BAUD = 115200;
 const int LOOP_DELAY = 2000;
 const int CS_PIN = 14;
 
@@ -13,7 +13,7 @@ TMC2130 stepper_driver;
 void setup()
 {
   // Setup serial communications
-  Serial.begin(BAUDRATE);
+  Serial.begin(BAUD);
 
   stepper_driver.setup(CS_PIN);
 
