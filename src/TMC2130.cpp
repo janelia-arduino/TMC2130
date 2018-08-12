@@ -2,7 +2,7 @@
 // TMC2130.cpp
 //
 // Authors:
-// Peter Polidoro polidorop@janelia.hhmi.org
+// Peter Polidoro peterpolidoro@gmail.com
 // ----------------------------------------------------------------------------
 #include "TMC2130.h"
 
