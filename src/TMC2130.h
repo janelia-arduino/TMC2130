@@ -14,8 +14,8 @@
 class TMC2130
 {
 public:
-  void setup(const size_t cs_pin);
-  void setup(const size_t cs_pin,
+  void setup(const size_t chip_select_pin);
+  void setup(const size_t chip_select_pin,
              const size_t enable_pin);
 
   bool communicating();
@@ -382,7 +382,7 @@ private:
   const static uint8_t ADDRESS_ENCM_CTRL = 0x72;
   const static uint8_t ADDRESS_LOST_STEPS = 0x73;
 
-  size_t cs_pin_;
+  size_t chip_select_pin_;
   int enable_pin_;
 
   const static size_t MICROSTEPS_PER_STEP_MIN = 1;
@@ -415,6 +415,10 @@ private:
   void setPwmThreshold(const uint32_t value);
   void setPwmConfig();
 
+  void enableClockSelect();
+  void disableClockSelect();
+  void spiBeginTransaction();
+  void spiEndTransaction();
 };
 
 #endif

@@ -7,13 +7,13 @@
 #include "TMC2130.h"
 
 
-void TMC2130::setup(const size_t cs_pin)
+void TMC2130::setup(const size_t chip_select_pin)
 {
-  cs_pin_ = cs_pin;
+  chip_select_pin_ = chip_select_pin;
   enable_pin_ = -1;
 
-  pinMode(cs_pin_,OUTPUT);
-  digitalWrite(cs_pin_,HIGH);
+  pinMode(chip_select_pin_,OUTPUT);
+  digitalWrite(chip_select_pin_,HIGH);
 
   SPI.begin();
 
@@ -36,10 +36,10 @@ void TMC2130::setup(const size_t cs_pin)
   pwm_config_.fields.pwm_autoscale = PWM_AUTOSCALE_DEFAULT;
 }
 
-void TMC2130::setup(const size_t cs_pin,
+void TMC2130::setup(const size_t chip_select_pin,
                     const size_t enable_pin)
 {
-  setup(cs_pin);
+  setup(chip_select_pin);
   setEnablePin(enable_pin);
 }
 
@@ -318,32 +318,14 @@ uint32_t TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_datagram)
   MisoDatagram miso_datagram;
   miso_datagram.uint64 = 0;
 
-  // Serial << "mosi_datagram = ";
-  // for (int i=(DATAGRAM_SIZE - 1); i>=0; --i)
-  // {
-  //   uint8_t byte = (mosi_datagram.uint64 >> (8*i)) & 0xff;
-  //   Serial << _HEX(byte) << " ";
-  // }
-  // Serial << endl;
-
-  SPI.beginTransaction(SPISettings(SPI_CLOCK,SPI_BIT_ORDER,SPI_MODE));
-  digitalWrite(cs_pin_,LOW);
+  spiBeginTransaction();
   for (int i=(DATAGRAM_SIZE - 1); i>=0; --i)
   {
     uint8_t byte_write = (mosi_datagram.uint64 >> (8*i)) & 0xff;
     uint8_t byte_read = SPI.transfer(byte_write);
     miso_datagram.uint64 |= byte_read << (8*i);
   }
-  digitalWrite(cs_pin_,HIGH);
-  SPI.endTransaction();
-
-  // Serial << "miso_datagram = ";
-  // for (int i=(DATAGRAM_SIZE - 1); i>=0; --i)
-  // {
-  //   uint8_t byte = (miso_datagram.uint64 >> (8*i)) & 0xff;
-  //   Serial << _HEX(byte) << " ";
-  // }
-  // Serial << endl;
+  spiEndTransaction();
 
   noInterrupts();
   spi_status_ = miso_datagram.fields.spi_status;
@@ -450,4 +432,25 @@ void TMC2130::setPwmThreshold(const uint32_t value)
 void TMC2130::setPwmConfig()
 {
   write(ADDRESS_PWMCONF,pwm_config_.uint32);
+}
+
+void TMC2130::enableClockSelect()
+{
+  digitalWrite(chip_select_pin_,LOW);
+}
+
+void TMC2130::disableClockSelect()
+{
+  digitalWrite(chip_select_pin_,HIGH);
+}
+void TMC2130::spiBeginTransaction()
+{
+  SPI.beginTransaction(SPISettings(SPI_CLOCK,SPI_BIT_ORDER,SPI_MODE));
+  enableClockSelect();
+}
+
+void TMC2130::spiEndTransaction()
+{
+  disableClockSelect();
+  SPI.endTransaction();
 }

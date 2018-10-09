@@ -5,7 +5,7 @@
 
 const long BAUD = 115200;
 const int LOOP_DELAY = 2000;
-const int CS_PIN = 14;
+const int CHIP_SELECT_PIN = 14;
 
 // Instantiate TMC2130
 TMC2130 stepper_driver;
@@ -15,7 +15,7 @@ void setup()
   // Setup serial communications
   Serial.begin(BAUD);
 
-  stepper_driver.setup(CS_PIN);
+  stepper_driver.setup(CHIP_SELECT_PIN);
 
 }
 
