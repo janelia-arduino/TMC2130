@@ -7,7 +7,7 @@
 #include "TMC2130.h"
 
 
-void TMC2130::setup(const size_t chip_select_pin)
+void TMC2130::setup(size_t chip_select_pin)
 {
   chip_select_pin_ = chip_select_pin;
   enable_pin_ = -1;
@@ -36,8 +36,8 @@ void TMC2130::setup(const size_t chip_select_pin)
   pwm_config_.fields.pwm_autoscale = PWM_AUTOSCALE_DEFAULT;
 }
 
-void TMC2130::setup(const size_t chip_select_pin,
-                    const size_t enable_pin)
+void TMC2130::setup(size_t chip_select_pin,
+                    size_t enable_pin)
 {
   setup(chip_select_pin);
   setEnablePin(enable_pin);
@@ -82,7 +82,7 @@ void TMC2130::disable()
   }
 }
 
-void TMC2130::setMicrostepsPerStep(const size_t microsteps_per_step)
+void TMC2130::setMicrostepsPerStep(size_t microsteps_per_step)
 {
   size_t microsteps_per_step_shifted = constrain(microsteps_per_step,
                                                  MICROSTEPS_PER_STEP_MIN,
@@ -102,7 +102,7 @@ size_t TMC2130::getMicrostepsPerStep()
   return 1 << microsteps_per_step_exponent_;
 }
 
-void TMC2130::setRunCurrent(const uint8_t percent)
+void TMC2130::setRunCurrent(uint8_t percent)
 {
   uint8_t run_current = percentToCurrentSetting(percent);
 
@@ -110,7 +110,7 @@ void TMC2130::setRunCurrent(const uint8_t percent)
   setDriverCurrent();
 }
 
-void TMC2130::setHoldCurrent(const uint8_t percent)
+void TMC2130::setHoldCurrent(uint8_t percent)
 {
   uint8_t hold_current = percentToCurrentSetting(percent);
 
@@ -118,7 +118,7 @@ void TMC2130::setHoldCurrent(const uint8_t percent)
   setDriverCurrent();
 }
 
-void TMC2130::setHoldDelay(const uint8_t percent)
+void TMC2130::setHoldDelay(uint8_t percent)
 {
   uint8_t hold_delay = percentToHoldDelaySetting(percent);
 
@@ -126,9 +126,9 @@ void TMC2130::setHoldDelay(const uint8_t percent)
   setDriverCurrent();
 }
 
-void TMC2130::setAllCurrentValues(const uint8_t run_current_percent,
-                                  const uint8_t hold_current_percent,
-                                  const uint8_t hold_delay_percent)
+void TMC2130::setAllCurrentValues(uint8_t run_current_percent,
+                                  uint8_t hold_current_percent,
+                                  uint8_t hold_delay_percent)
 {
   uint8_t run_current = percentToCurrentSetting(run_current_percent);
   uint8_t hold_current = percentToCurrentSetting(hold_current_percent);
@@ -205,14 +205,14 @@ void TMC2130::setZeroHoldCurrentMode(TMC2130::ZeroHoldCurrentMode mode)
   setPwmConfig();
 }
 
-void TMC2130::setPwmOffset(const uint8_t pwm_amplitude)
+void TMC2130::setPwmOffset(uint8_t pwm_amplitude)
 {
   uint8_t pwm_ampl = pwmAmplitudeToPwmAmpl(pwm_amplitude);
   pwm_config_.fields.pwm_ampl = pwm_ampl;
   setPwmConfig();
 }
 
-void TMC2130::setPwmGradient(const uint8_t pwm_amplitude)
+void TMC2130::setPwmGradient(uint8_t pwm_amplitude)
 {
   uint8_t pwm_grad = pwmAmplitudeToPwmGrad(pwm_amplitude);
   pwm_config_.fields.pwm_grad = pwm_grad;
@@ -240,7 +240,7 @@ TMC2130::Settings TMC2130::getSettings()
 }
 
 // private
-void TMC2130::setEnablePin(const size_t enable_pin)
+void TMC2130::setEnablePin(size_t enable_pin)
 {
   enable_pin_ = enable_pin;
 
@@ -256,7 +256,7 @@ void TMC2130::setEnablePin(const size_t enable_pin)
 // {
 // }
 
-void TMC2130::setMicrostepsPerStepPowerOfTwo(const uint8_t exponent)
+void TMC2130::setMicrostepsPerStepPowerOfTwo(uint8_t exponent)
 {
   microsteps_per_step_exponent_ = exponent;
 
@@ -334,8 +334,8 @@ uint32_t TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_datagram)
   return miso_datagram.fields.data;
 }
 
-uint32_t TMC2130::write(const uint8_t address,
-                        const uint32_t data)
+uint32_t TMC2130::write(uint8_t address,
+                        uint32_t data)
 {
   MosiDatagram mosi_datagram;
   mosi_datagram.uint64 = 0;
@@ -346,7 +346,7 @@ uint32_t TMC2130::write(const uint8_t address,
   return sendReceivePrevious(mosi_datagram);
 }
 
-uint32_t TMC2130::read(const uint8_t address)
+uint32_t TMC2130::read(uint8_t address)
 {
   MosiDatagram mosi_datagram;
   mosi_datagram.uint64 = 0;
@@ -359,7 +359,7 @@ uint32_t TMC2130::read(const uint8_t address)
   return data;
 }
 
-uint8_t TMC2130::percentToCurrentSetting(const uint8_t percent)
+uint8_t TMC2130::percentToCurrentSetting(uint8_t percent)
 {
   uint8_t current_percent = constrain(percent,
                                       PERCENT_MIN,
@@ -372,7 +372,7 @@ uint8_t TMC2130::percentToCurrentSetting(const uint8_t percent)
   return current_setting;
 }
 
-uint8_t TMC2130::percentToHoldDelaySetting(const uint8_t percent)
+uint8_t TMC2130::percentToHoldDelaySetting(uint8_t percent)
 {
   uint8_t hold_delay_percent = constrain(percent,
                                          PERCENT_MIN,
@@ -385,7 +385,7 @@ uint8_t TMC2130::percentToHoldDelaySetting(const uint8_t percent)
   return hold_delay;
 }
 
-uint8_t TMC2130::pwmAmplitudeToPwmAmpl(const uint8_t pwm_amplitude)
+uint8_t TMC2130::pwmAmplitudeToPwmAmpl(uint8_t pwm_amplitude)
 {
   uint8_t pwm_ampl = pwm_amplitude;
   if (pwm_config_.fields.pwm_autoscale)
@@ -397,7 +397,7 @@ uint8_t TMC2130::pwmAmplitudeToPwmAmpl(const uint8_t pwm_amplitude)
   return pwm_ampl;
 }
 
-uint8_t TMC2130::pwmAmplitudeToPwmGrad(const uint8_t pwm_amplitude)
+uint8_t TMC2130::pwmAmplitudeToPwmGrad(uint8_t pwm_amplitude)
 {
   uint8_t pwm_grad = pwm_amplitude;
   if (pwm_config_.fields.pwm_autoscale)
@@ -424,7 +424,7 @@ void TMC2130::setChopperConfig()
   write(ADDRESS_CHOPCONF,chopper_config_.uint32);
 }
 
-void TMC2130::setPwmThreshold(const uint32_t value)
+void TMC2130::setPwmThreshold(uint32_t value)
 {
   write(ADDRESS_TPWMTHRS,value);
 }

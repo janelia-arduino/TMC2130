@@ -14,9 +14,9 @@
 class TMC2130
 {
 public:
-  void setup(const size_t chip_select_pin);
-  void setup(const size_t chip_select_pin,
-             const size_t enable_pin);
+  void setup(size_t chip_select_pin);
+  void setup(size_t chip_select_pin,
+             size_t enable_pin);
 
   bool communicating();
   uint8_t getVersion();
@@ -27,15 +27,15 @@ public:
   void disable();
 
   // valid values = 1,2,4,8,...128,256, other values get rounded down
-  void setMicrostepsPerStep(const size_t microsteps_per_step);
+  void setMicrostepsPerStep(size_t microsteps_per_step);
   size_t getMicrostepsPerStep();
 
-  void setRunCurrent(const uint8_t percent);
-  void setHoldCurrent(const uint8_t percent);
-  void setHoldDelay(const uint8_t percent);
-  void setAllCurrentValues(const uint8_t run_current_percent,
-                           const uint8_t hold_current_percent,
-                           const uint8_t hold_delay_percent);
+  void setRunCurrent(uint8_t percent);
+  void setHoldCurrent(uint8_t percent);
+  void setHoldDelay(uint8_t percent);
+  void setAllCurrentValues(uint8_t run_current_percent,
+                           uint8_t hold_current_percent,
+                           uint8_t hold_delay_percent);
 
   struct Status
   {
@@ -67,15 +67,15 @@ public:
   void enableAutomaticCurrentScaling();
   void disableAutomaticCurrentScaling();
   enum ZeroHoldCurrentMode
-    {
-     NORMAL=0,
-     FREEWHEELING=1,
-     STRONG_BRAKING=2,
-     BRAKING=3,
-    };
+  {
+    NORMAL=0,
+    FREEWHEELING=1,
+    STRONG_BRAKING=2,
+    BRAKING=3,
+  };
   void setZeroHoldCurrentMode(ZeroHoldCurrentMode mode);
-  void setPwmOffset(const uint8_t pwm_amplitude);
-  void setPwmGradient(const uint8_t pwm_amplitude);
+  void setPwmOffset(uint8_t pwm_amplitude);
+  void setPwmGradient(uint8_t pwm_amplitude);
   uint8_t getPwmScale();
 
   struct Settings
@@ -390,29 +390,29 @@ private:
   const static uint8_t MICROSTEPS_PER_STEP_EXPONENT_MAX = 8;
   uint8_t microsteps_per_step_exponent_;
 
-  void setEnablePin(const size_t enable_pin);
+  void setEnablePin(size_t enable_pin);
 
   // void setStepDirInput();
   // void setSpiInput();
 
   // microsteps = 2^exponent, 0=1,1=2,2=4,...8=256
-  void setMicrostepsPerStepPowerOfTwo(const uint8_t exponent);
+  void setMicrostepsPerStepPowerOfTwo(uint8_t exponent);
 
   uint32_t sendReceivePrevious(MosiDatagram & mosi_datagram);
-  uint32_t write(const uint8_t address,
-                 const uint32_t data);
-  uint32_t read(const uint8_t address);
+  uint32_t write(uint8_t address,
+                 uint32_t data);
+  uint32_t read(uint8_t address);
 
-  uint8_t percentToCurrentSetting(const uint8_t percent);
-  uint8_t percentToHoldDelaySetting(const uint8_t percent);
+  uint8_t percentToCurrentSetting(uint8_t percent);
+  uint8_t percentToHoldDelaySetting(uint8_t percent);
 
-  uint8_t pwmAmplitudeToPwmAmpl(const uint8_t pwm_amplitude);
-  uint8_t pwmAmplitudeToPwmGrad(const uint8_t pwm_amplitude);
+  uint8_t pwmAmplitudeToPwmAmpl(uint8_t pwm_amplitude);
+  uint8_t pwmAmplitudeToPwmGrad(uint8_t pwm_amplitude);
 
   void setGlobalConfig();
   void setDriverCurrent();
   void setChopperConfig();
-  void setPwmThreshold(const uint32_t value);
+  void setPwmThreshold(uint32_t value);
   void setPwmConfig();
 
   void enableClockSelect();
