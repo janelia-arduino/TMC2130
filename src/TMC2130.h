@@ -16,7 +16,7 @@ class TMC2130
 public:
   void setup(size_t chip_select_pin);
   void setup(size_t chip_select_pin,
-             size_t enable_pin);
+    size_t enable_pin);
 
   bool communicating();
   uint8_t getVersion();
@@ -34,8 +34,8 @@ public:
   void setHoldCurrent(uint8_t percent);
   void setHoldDelay(uint8_t percent);
   void setAllCurrentValues(uint8_t run_current_percent,
-                           uint8_t hold_current_percent,
-                           uint8_t hold_delay_percent);
+    uint8_t hold_current_percent,
+    uint8_t hold_delay_percent);
 
   struct Status
   {
@@ -400,7 +400,7 @@ private:
 
   uint32_t sendReceivePrevious(MosiDatagram & mosi_datagram);
   uint32_t write(uint8_t address,
-                 uint32_t data);
+    uint32_t data);
   uint32_t read(uint8_t address);
 
   uint8_t percentToCurrentSetting(uint8_t percent);

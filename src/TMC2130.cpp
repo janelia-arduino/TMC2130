@@ -37,7 +37,7 @@ void TMC2130::setup(size_t chip_select_pin)
 }
 
 void TMC2130::setup(size_t chip_select_pin,
-                    size_t enable_pin)
+  size_t enable_pin)
 {
   setup(chip_select_pin);
   setEnablePin(enable_pin);
@@ -85,8 +85,8 @@ void TMC2130::disable()
 void TMC2130::setMicrostepsPerStep(size_t microsteps_per_step)
 {
   size_t microsteps_per_step_shifted = constrain(microsteps_per_step,
-                                                 MICROSTEPS_PER_STEP_MIN,
-                                                 MICROSTEPS_PER_STEP_MAX);
+    MICROSTEPS_PER_STEP_MIN,
+    MICROSTEPS_PER_STEP_MAX);
   microsteps_per_step_shifted = microsteps_per_step >> 1;
   size_t exponent = 0;
   while (microsteps_per_step_shifted > 0)
@@ -127,8 +127,8 @@ void TMC2130::setHoldDelay(uint8_t percent)
 }
 
 void TMC2130::setAllCurrentValues(uint8_t run_current_percent,
-                                  uint8_t hold_current_percent,
-                                  uint8_t hold_delay_percent)
+  uint8_t hold_current_percent,
+  uint8_t hold_delay_percent)
 {
   uint8_t run_current = percentToCurrentSetting(run_current_percent);
   uint8_t hold_current = percentToCurrentSetting(hold_current_percent);
@@ -335,7 +335,7 @@ uint32_t TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_datagram)
 }
 
 uint32_t TMC2130::write(uint8_t address,
-                        uint32_t data)
+  uint32_t data)
 {
   MosiDatagram mosi_datagram;
   mosi_datagram.uint64 = 0;
@@ -362,26 +362,26 @@ uint32_t TMC2130::read(uint8_t address)
 uint8_t TMC2130::percentToCurrentSetting(uint8_t percent)
 {
   uint8_t current_percent = constrain(percent,
-                                      PERCENT_MIN,
-                                      PERCENT_MAX);
+    PERCENT_MIN,
+    PERCENT_MAX);
   uint8_t current_setting = map(current_percent,
-                                PERCENT_MIN,
-                                PERCENT_MAX,
-                                CURRENT_SETTING_MIN,
-                                CURRENT_SETTING_MAX);
+    PERCENT_MIN,
+    PERCENT_MAX,
+    CURRENT_SETTING_MIN,
+    CURRENT_SETTING_MAX);
   return current_setting;
 }
 
 uint8_t TMC2130::percentToHoldDelaySetting(uint8_t percent)
 {
   uint8_t hold_delay_percent = constrain(percent,
-                                         PERCENT_MIN,
-                                         PERCENT_MAX);
+    PERCENT_MIN,
+    PERCENT_MAX);
   uint8_t hold_delay = map(hold_delay_percent,
-                           PERCENT_MIN,
-                           PERCENT_MAX,
-                           HOLD_DELAY_MIN,
-                           HOLD_DELAY_MAX);
+    PERCENT_MIN,
+    PERCENT_MAX,
+    HOLD_DELAY_MIN,
+    HOLD_DELAY_MAX);
   return hold_delay;
 }
 
@@ -391,8 +391,8 @@ uint8_t TMC2130::pwmAmplitudeToPwmAmpl(uint8_t pwm_amplitude)
   if (pwm_config_.fields.pwm_autoscale)
   {
     pwm_ampl = constrain(pwm_ampl,
-                         PWM_AMPL_AUTOSCALE_MIN,
-                         PWM_AMPL_AUTOSCALE_MAX);
+      PWM_AMPL_AUTOSCALE_MIN,
+      PWM_AMPL_AUTOSCALE_MAX);
   }
   return pwm_ampl;
 }
@@ -403,8 +403,8 @@ uint8_t TMC2130::pwmAmplitudeToPwmGrad(uint8_t pwm_amplitude)
   if (pwm_config_.fields.pwm_autoscale)
   {
     pwm_grad = constrain(pwm_grad,
-                         PWM_GRAD_AUTOSCALE_MIN,
-                         PWM_GRAD_AUTOSCALE_MAX);
+      PWM_GRAD_AUTOSCALE_MIN,
+      PWM_GRAD_AUTOSCALE_MAX);
   }
   return pwm_grad;
 }
