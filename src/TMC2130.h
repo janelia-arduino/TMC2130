@@ -2,7 +2,7 @@
 // TMC2130.h
 //
 // Authors:
-// Peter Polidoro peterpolidoro@gmail.com
+// Peter Polidoro peter@polidoro.io
 // ----------------------------------------------------------------------------
 
 #ifndef TMC2130_H

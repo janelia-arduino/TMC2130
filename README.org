@@ -1,6 +1,6 @@
 #+TITLE: TMC2130
 #+AUTHOR: Peter Polidoro
-#+EMAIL: peterpolidoro@gmail.com
+#+EMAIL: peter@polidoro.io
 
 * Library Information
   - Name :: TMC2130
@@ -8,7 +8,7 @@
   - License :: BSD
   - URL :: https://github.com/janelia-arduino/TMC2130
   - Author :: Peter Polidoro
-  - Email :: peterpolidoro@gmail.com
+  - Email :: peter@polidoro.io
 
   Trinamic TMC2130 bipolar stepper motor driver Arduino library with
   Step/Dir Interface and SPI.
