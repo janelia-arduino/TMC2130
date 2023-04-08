@@ -15,3 +15,5 @@
 
   Up to 2.0A motor current per coil and stealthChop for quiet movement.
   It is used in the SilentStepStick TMC2130.
+  
+  Dependencies: Requires library Streaming by Mikal Hart https://github.com/janelia-arduino/Streaming
