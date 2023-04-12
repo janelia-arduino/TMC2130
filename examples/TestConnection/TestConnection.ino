@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <SPI.h>
-#include <Streaming.h>
 #include <TMC2130.h>
 
 const long BAUD = 115200;
@@ -23,38 +22,49 @@ void loop()
 {
   if (stepper_driver.communicating())
   {
-    Serial << "SPI communicating with stepper driver!\n";
+    Serial.println("SPI communicating with stepper driver!");
   }
   else
   {
-    Serial << "SPI not communicating with stepper driver!\n";
+    Serial.println("SPI not communicating with stepper driver!");
   }
 
   stepper_driver.initialize();
 
   TMC2130::Status status = stepper_driver.getStatus();
-  Serial << "status.load = " << status.load << "\n";
-  Serial << "status.full_step_active = " << status.full_step_active << "\n";
-  Serial << "status.current_scaling = " << status.current_scaling << "\n";
-  Serial << "status.stall = " << status.stall << "\n";
-  Serial << "status.over_temperature_shutdown = " << status.over_temperature_shutdown << "\n";
-  Serial << "status.over_temperature_warning = " << status.over_temperature_warning << "\n";
-  Serial << "status.short_to_ground_a = " << status.short_to_ground_a << "\n";
-  Serial << "status.short_to_ground_b = " << status.short_to_ground_b << "\n";
-  Serial << "status.open_load_a = " << status.open_load_a << "\n";
-  Serial << "status.open_load_b = " << status.open_load_b << "\n";
-  Serial << "status.standstill = " << status.standstill << "\n";
+  Serial.print("status.load = ");
+  Serial.println(status.load);
+  Serial.print("status.full_step_active = ");
+  Serial.println(status.full_step_active);
+  Serial.print("status.current_scaling = ");
+  Serial.println(status.current_scaling);
+  Serial.print("status.stall = ");
+  Serial.println(status.stall);
+  Serial.print("status.over_temperature_shutdown = ");
+  Serial.println(status.over_temperature_shutdown);
+  Serial.print("status.over_temperature_warning = ");
+  Serial.println(status.over_temperature_warning);
+  Serial.print("status.short_to_ground_a = ");
+  Serial.println(status.short_to_ground_a);
+  Serial.print("status.short_to_ground_b = ");
+  Serial.println(status.short_to_ground_b);
+  Serial.print("status.open_load_a = ");
+  Serial.println(status.open_load_a);
+  Serial.print("status.open_load_b = ");
+  Serial.println(status.open_load_b);
+  Serial.print("status.standstill = ");
+  Serial.println(status.standstill);
 
   // stepper_driver.setRunCurrent(100);
-  // Serial << "\n";
+  // Serial.println();
   // stepper_driver.setHoldCurrent(50);
-  // Serial << "\n";
+  // Serial.println();
   // stepper_driver.setHoldDelay(50);
-  // Serial << "\n";
+  // Serial.println();
 
   // stepper_driver.setAllCurrentValues(100,50,50);
-  // Serial << "\n";
+  // Serial.println();
 
-  Serial << "\n";
+  Serial.println();
   delay(LOOP_DELAY);
 }

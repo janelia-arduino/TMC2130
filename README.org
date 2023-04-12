@@ -4,7 +4,7 @@
 
 * Library Information
   - Name :: TMC2130
-  - Version :: 1.0.4
+  - Version :: 1.0.5
   - License :: BSD
   - URL :: https://github.com/janelia-arduino/TMC2130
   - Author :: Peter Polidoro
@@ -15,5 +15,3 @@
 
   Up to 2.0A motor current per coil and stealthChop for quiet movement.
   It is used in the SilentStepStick TMC2130.
-  
-  Dependencies: Requires library Streaming by Mikal Hart https://github.com/janelia-arduino/Streaming
