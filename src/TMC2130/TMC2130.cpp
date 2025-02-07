@@ -323,7 +323,7 @@ uint32_t TMC2130::sendReceivePrevious(TMC2130::MosiDatagram & mosi_datagram)
   {
     uint8_t byte_write = (mosi_datagram.uint64 >> (8*i)) & 0xff;
     uint8_t byte_read = SPI.transfer(byte_write);
-    miso_datagram.uint64 |= byte_read << (8*i);
+    miso_datagram.uint64 |= (uint64_t)byte_read << (8*i);
   }
   spiEndTransaction();
 

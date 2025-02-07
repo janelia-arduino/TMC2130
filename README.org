@@ -4,7 +4,7 @@
 
 * Library Information
   - Name :: TMC2130
-  - Version :: 1.0.5
+  - Version :: 1.0.6
   - License :: BSD
   - URL :: https://github.com/janelia-arduino/TMC2130
   - Author :: Peter Polidoro
